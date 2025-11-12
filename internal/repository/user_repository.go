@@ -27,7 +27,8 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	query := `SELECT id, username, email, password_hash, created_at, updated_at FROM users WHERE id = $1`
 	user := &models.User{}
-	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt)
+	err := r.db.QueryRow(query, id).
+		Scan(&user.ID, &user.Username, &user.Email, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
