@@ -12,6 +12,8 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
+	database.RunMigrations(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
+
 	db, err := database.Connect(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
