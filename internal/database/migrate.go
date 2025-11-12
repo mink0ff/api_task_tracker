@@ -15,7 +15,6 @@ func RunMigrations(host, port, user, password, dbname string) {
 		user, password, host, port, dbname)
 
 	absPath, err := filepath.Abs("migrations")
-	fmt.Println(absPath)
 	if err != nil {
 		log.Fatalf("Failed to get absolute path for migrations: %v", err)
 	}
