@@ -34,9 +34,60 @@ func (r *TaskRepository) GetTaskByID(id int) (*models.Task, error) {
 	return task, nil
 }
 
+func (r *TaskRepository) GetTasksByAssigneeID(assigneeID int) ([]*models.Task, error) {
+	query := `SELECT id, title, description, status, creator_id, created_at, updated_at FROM tasks WHERE assignee_id = $1`
+	rows, err := r.db.Query(query, assigneeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []*models.Task
+	for rows.Next() {
+		task := &models.Task{}
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description,
+			&task.Status, &task.CreatorID,
+			&task.CreatedAt, &task.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}
+
 func (r *TaskRepository) UpdateTask(task *models.Task) error {
 	query := `UPDATE tasks SET title = $1, description = $2, status = $3, assignee_id = $4 WHERE id = $5`
 	_, err := r.db.Exec(query, task.Title, task.Description, task.Status, task.AssigneeID, task.ID)
 
 	return err
+}
+
+func (r *TaskRepository) DeleteTask(id int) error {
+	query := `DELETE FROM tasks WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+
+	return err
+}
+
+func (r *TaskRepository) ListTasks() ([]*models.Task, error) {
+	query := `SELECT id, title, description, status, creator_id, assignee_id, created_at, updated_atFROM tasks`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []*models.Task
+	for rows.Next() {
+		task := &models.Task{}
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description,
+			&task.Status, &task.CreatorID, &task.AssigneeID,
+			&task.CreatedAt, &task.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
 }
