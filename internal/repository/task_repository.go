@@ -40,3 +40,32 @@ func (r *TaskRepository) UpdateTask(task *models.Task) error {
 
 	return err
 }
+
+func (r *TaskRepository) DeleteTask(id int) error {
+	query := `DELETE FROM tasks WHERE id = $1`
+	_, err := r.db.Exec(query, id)
+
+	return err
+}
+
+func (r *TaskRepository) ListTasks() ([]*models.Task, error) {
+	query := `SELECT id, title, description, status, creator_id, assignee_id, created_at, updated_atFROM tasks`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []*models.Task
+	for rows.Next() {
+		task := &models.Task{}
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description,
+			&task.Status, &task.CreatorID, &task.AssigneeID,
+			&task.CreatedAt, &task.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}
