@@ -8,66 +8,68 @@ import (
 	"github.com/mink0ff/api_task_tracker/internal/repository"
 )
 
-type TaskService struct {
-	taskRepo *repository.TaskRepository
+type UserService struct {
+	userRepo *repository.UserRepository
 }
 
-func NewTaskService(taskRepo *repository.TaskRepository) *TaskService {
-	return &TaskService{taskRepo: taskRepo}
+func NewUserService(userRepo *repository.UserRepository) *UserService {
+	return &UserService{userRepo: userRepo}
 }
 
-func (s *TaskService) CreateTask(req *models.CreateTaskRequest, creatorID int) (*models.Task, error) {
-	task := &models.Task{
-		Title:       req.Title,
-		Description: req.Description,
-		Status:      req.Status,
-		CreatorID:   creatorID,
-		AssigneeID:  req.AssigneeID,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+func hashPassword(password string) string {
+	// не забыдь сделать реальную хеш-функцию
+	return "hashed_" + password
+}
+
+func (s *UserService) CreateUser(req *models.CreateUserRequest) (*models.User, error) {
+	user := &models.User{
+		Username:     req.Username,
+		Email:        req.Email,
+		PasswordHash: hashPassword(req.Password),
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
-	if err := s.taskRepo.CreateTask(task); err != nil {
+	if err := s.userRepo.CreateUser(user); err != nil {
 		return nil, err
 	}
 
-	return task, nil
+	return user, nil
 }
 
-func (s *TaskService) GetTaskByID(id int) (*models.Task, error) {
-	return s.taskRepo.GetTaskByID(id)
+func (s *UserService) GetUserByID(id int) (*models.User, error) {
+	return s.userRepo.GetUserByID(id)
 }
 
-func (s *TaskService) GetTasksByAssigneeID(assignee_id int) ([]*models.Task, error) {
-	return s.taskRepo.GetTasksByAssigneeID(assignee_id)
-}
-
-func (s *TaskService) UpdateTask(id int, req models.UpdateTaskRequest) error {
-	task, err := s.taskRepo.GetTaskByID(id)
+func (s *UserService) UpdateUser(id int, req *models.UpdateUserRequest) error {
+	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		return err
 	}
-	if task == nil {
-		return errors.New("task not found")
+	if user == nil {
+		return errors.New("user not found")
 	}
-	if req.Title != nil {
-		task.Title = *req.Title
+	if req.Username != nil {
+		user.Username = *req.Username
 	}
-	if req.Description != nil {
-		task.Description = *req.Description
+	if req.Email != nil {
+		user.Email = *req.Email
 	}
-	if req.Status != nil {
-		task.Status = *req.Status
+	if req.Password != nil {
+		user.PasswordHash = hashPassword(*req.Password)
 	}
-	if req.AssigneeID != nil {
-		task.AssigneeID = *req.AssigneeID
-	}
+	user.UpdatedAt = time.Now()
 
-	task.UpdatedAt = time.Now()
-
-	return s.taskRepo.UpdateTask(task)
+	return s.userRepo.UpdateUser(user)
 }
 
-func (s *TaskService) DeleteTask(id int) error {
-	return s.taskRepo.DeleteTask(id)
+func (s *UserService) AuthenticateUser(email, password string) (*models.User, error) {
+	user, err := s.userRepo.GetUserByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil || user.PasswordHash != hashPassword(password) {
+		return nil, errors.New("invalid email or password")
+	}
+	return user, nil
 }
