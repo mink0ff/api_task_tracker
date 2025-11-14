@@ -6,6 +6,7 @@ import (
 
 	"github.com/mink0ff/api_task_tracker/internal/models"
 	"github.com/mink0ff/api_task_tracker/internal/repository"
+	"github.com/mink0ff/api_task_tracker/internal/utils"
 )
 
 type UserService struct {
@@ -16,16 +17,11 @@ func NewUserService(userRepo *repository.UserRepository) *UserService {
 	return &UserService{userRepo: userRepo}
 }
 
-func hashPassword(password string) string {
-	// не забыдь сделать реальную хеш-функцию
-	return "hashed_" + password
-}
-
 func (s *UserService) CreateUser(req *models.CreateUserRequest) (*models.User, error) {
 	user := &models.User{
 		Username:     req.Username,
 		Email:        req.Email,
-		PasswordHash: hashPassword(req.Password),
+		PasswordHash: utils.HashPassword(req.Password),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -56,7 +52,7 @@ func (s *UserService) UpdateUser(id int, req *models.UpdateUserRequest) error {
 		user.Email = *req.Email
 	}
 	if req.Password != nil {
-		user.PasswordHash = hashPassword(*req.Password)
+		user.PasswordHash = utils.HashPassword(*req.Password)
 	}
 	user.UpdatedAt = time.Now()
 
@@ -68,7 +64,7 @@ func (s *UserService) AuthenticateUser(email, password string) (*models.User, er
 	if err != nil {
 		return nil, err
 	}
-	if user == nil || user.PasswordHash != hashPassword(password) {
+	if user == nil || user.PasswordHash != utils.HashPassword(password) {
 		return nil, errors.New("invalid email or password")
 	}
 	return user, nil
