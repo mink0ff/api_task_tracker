@@ -3,10 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	_ "os/user"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
+
 	"github.com/mink0ff/api_task_tracker/internal/config"
 	"github.com/mink0ff/api_task_tracker/internal/database"
+	"github.com/mink0ff/api_task_tracker/internal/handler"
+	"github.com/mink0ff/api_task_tracker/internal/repository"
+	"github.com/mink0ff/api_task_tracker/internal/service"
 )
 
 func main() {
@@ -20,9 +25,24 @@ func main() {
 	}
 	defer db.Close()
 
-	r := mux.NewRouter()
-	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	taskRepo := repository.NewTaskRepository(db.DB)
+	userRepo := repository.NewUserRepository(db.DB)
+
+	taskService := service.NewTaskService(taskRepo)
+	userService := service.NewUserService(userRepo)
+
+	taskHandler := handler.NewTaskHandler(taskService)
+	// userHandler := handler.NewUserHandler(userService)
+	_ = userService
+
+	r := chi.NewRouter()
+
+	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
+	})
+
+	r.Route("/tasks", func(r chi.Router) {
+		r.Post("/", taskHandler.CreateTask)
 	})
 
 	log.Println("Server started on :8080")
