@@ -18,7 +18,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) CreateUser(user *models.User) error {
 	query := `INSERT INTO users (username, email, password_hash, created_at, updated_at) 
-	VALUES ($1, $2, $3, NOW(), NOW()) RETURNING id created_at, updated_at`
+	VALUES ($1, $2, $3, NOW(), NOW()) RETURNING id, created_at, updated_at`
 
 	return r.db.QueryRow(query, user.Username, user.Email, user.PasswordHash).
 		Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)

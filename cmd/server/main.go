@@ -32,8 +32,7 @@ func main() {
 	userService := service.NewUserService(userRepo)
 
 	taskHandler := handler.NewTaskHandler(taskService)
-	// userHandler := handler.NewUserHandler(userService)
-	_ = userService
+	userHandler := handler.NewUserHandler(userService)
 
 	r := chi.NewRouter()
 
@@ -43,6 +42,10 @@ func main() {
 
 	r.Route("/tasks", func(r chi.Router) {
 		r.Post("/", taskHandler.CreateTask)
+	})
+
+	r.Route("/users", func(r chi.Router) {
+		r.Post("/", userHandler.CreateUser)
 	})
 
 	log.Println("Server started on :8080")
