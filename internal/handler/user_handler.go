@@ -1,0 +1,36 @@
+package handler
+
+import (
+	"encoding/json"
+	"net/http"
+	_ "strconv"
+
+	"github.com/mink0ff/api_task_tracker/internal/models"
+	"github.com/mink0ff/api_task_tracker/internal/service"
+	"github.com/mink0ff/api_task_tracker/internal/utils"
+)
+
+type UserHandler struct {
+	service *service.UserService
+}
+
+func NewUserHandler(s *service.UserService) *UserHandler {
+	return &UserHandler{service: s}
+}
+
+// POST /users
+func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var req models.CreateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.service.CreateUser(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteJSON(w, user, http.StatusCreated)
+}
