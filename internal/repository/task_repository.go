@@ -44,7 +44,7 @@ func (r *TaskRepository) GetTasksByAssigneeID(assigneeID int) ([]*models.Task, e
 
 	var tasks []*models.Task
 	for rows.Next() {
-		task := &models.Task{}
+		task := &models.Task{AssigneeID: assigneeID}
 		if err := rows.Scan(&task.ID, &task.Title, &task.Description,
 			&task.Status, &task.CreatorID,
 			&task.CreatedAt, &task.UpdatedAt); err != nil {

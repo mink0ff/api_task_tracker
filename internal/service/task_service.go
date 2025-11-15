@@ -42,7 +42,7 @@ func (s *TaskService) GetTasksByAssigneeID(assignee_id int) ([]*models.Task, err
 	return s.taskRepo.GetTasksByAssigneeID(assignee_id)
 }
 
-func (s *TaskService) UpdateTask(id int, req models.UpdateTaskRequest) error {
+func (s *TaskService) UpdateTask(id int, req *models.UpdateTaskRequest) error {
 	task, err := s.taskRepo.GetTaskByID(id)
 	if err != nil {
 		return err

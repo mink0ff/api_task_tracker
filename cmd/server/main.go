@@ -42,6 +42,9 @@ func main() {
 
 	r.Route("/tasks", func(r chi.Router) {
 		r.Post("/", taskHandler.CreateTask)
+		r.Get("/", taskHandler.GetTasksByAssigneeID)
+		r.Put("/{id}", taskHandler.UpdateTask)
+		r.Delete("/{id}", taskHandler.DeleteTask)
 	})
 
 	r.Route("/users", func(r chi.Router) {
