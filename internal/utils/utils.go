@@ -17,3 +17,7 @@ func WriteJSON(w http.ResponseWriter, data interface{}, status int) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
 }
+
+func CheckPassword(hashedPassword, password string) bool {
+	return hashedPassword == HashPassword(password)
+}

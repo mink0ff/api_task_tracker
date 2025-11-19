@@ -49,6 +49,8 @@ func main() {
 
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/", userHandler.CreateUser)
+		r.Get("/{id}", userHandler.GetUserByID)
+		r.Put("/{id}", userHandler.UpdateUser)
 	})
 
 	log.Println("Server started on :8080")
