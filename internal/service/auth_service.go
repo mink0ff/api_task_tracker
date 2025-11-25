@@ -11,10 +11,10 @@ import (
 
 type AuthService struct {
 	userRepo *repository.UserRepository
-	jwtMaker auth.JWTManager
+	jwtMaker *auth.JWTManager
 }
 
-func NewAuthService(userRepo *repository.UserRepository, jwtMaker auth.JWTManager) *AuthService {
+func NewAuthService(userRepo *repository.UserRepository, jwtMaker *auth.JWTManager) *AuthService {
 	return &AuthService{
 		userRepo: userRepo,
 		jwtMaker: jwtMaker,
