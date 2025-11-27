@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mink0ff/tasktracker/internal/models"
-	"github.com/mink0ff/tasktracker/internal/service"
-	"github.com/mink0ff/tasktracker/internal/utils"
+	"github.com/mink0ff/api_task_tracker/internal/models"
+	"github.com/mink0ff/api_task_tracker/internal/service"
+	"github.com/mink0ff/api_task_tracker/internal/utils"
 )
 
 type AuthHandler struct {
